@@ -62,8 +62,5 @@ Thumbs.db
 !.gitignore
 !.nvmrc
 !.phpcs.xml.dist
-
-# Include .env files
-!.env
 *.env
 *.env.*
