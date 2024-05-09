@@ -232,7 +232,7 @@ const changeCurrentPassword = asyncHandler( async (req,res) => {
     user.save({validateBeforeSave:false});
     return res
     .status(200)
-    .json(ApiError(200, "Password changed successfully"));
+    .json(new  ApiResponse(200, "Password changed successfully"));
     
 } )
 
@@ -240,7 +240,7 @@ const changeCurrentPassword = asyncHandler( async (req,res) => {
 const getCurrentUser = asyncHandler( async (req,res) => {
     return res
         .status(200)
-        .json(200, req.user, "User details fetched successfully");
+        .json(new ApiResponse(200, req.user, "User details fetched successfully"));
 } )
 
 const updateUserDetails = asyncHandler( async(req,res) => {
@@ -264,7 +264,7 @@ const updateUserDetails = asyncHandler( async(req,res) => {
 
     return res
     .status(200)
-    .json(200, user ,"User details updated successfully");
+    .json(new ApiResponse(200, user ,"User details updated successfully"));
 } )
 
 const updateUserAvatar = asyncHandler( async (req,res) => {
@@ -316,7 +316,7 @@ const updateUsercoverImage = asyncHandler( async (req,res) => {
     ).select(" -password");
     return res
         .status(200)
-        .json(200, req.user, "User coverImage Updated successfully");
+        .json(new ApiResponse(200, req.user, "User coverImage Updated successfully"));
 } )
 
 export { registerUser, 
