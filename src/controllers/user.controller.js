@@ -3,6 +3,26 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {User} from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import {ApiResponse}  from "../utils/ApiResponse.js";
+import {generateAccessToken} from "../models/user.model.js";
+import {generateRefreshToken} from "../models/user.model.js";
+
+const generateAccessAndRefreshToken = async (userId) => {
+    try
+    {
+        const user = await User.findById(userId);
+        const accessToken = await user.generateAccessToken();
+        const refreshToken = await user.generateRefreshToken();
+        user.refreshToken= refreshToken;
+        await user.save({validateBeforeSave:false});
+        return {accessToken,refreshToken};
+    }
+    catch(err)
+    {
+        throw new ApiError(500, "Error creating the access and refresh token from server side");
+    }
+}
+
+
 const registerUser = asyncHandler( async (req,res) => {
     // validation
     // check if user already exists
@@ -70,5 +90,61 @@ const registerUser = asyncHandler( async (req,res) => {
     )
 
 } )
+
+const loginUser = asyncHandler( async (req,res) => {
+
+    // req.body input 
+    // validation 
+    // find the user
+    // password check
+    //access and refresh token
+    // create and send cookie
+
+    const { email, username, password } = req.body;
+    // validation 
+    if( !email && !username ) 
+    {
+        throw new ApiError(400, " username or email is requied for Signing in ");
+    }
+    const user = await User.findOne({
+        $or : [{username},{email}]
+    });
+
+    if(!user)
+    {
+        throw new ApiError(400, "User doesnot exists");
+    }
+    // password checking 
+    const isPasswordCorrect = await user.isPasswordCorrect(password);
+    if(!isPasswordCorrect)
+    {
+        throw new ApiError(400, "Invalid password credentials")
+    }
+    // creating access and refresh token
+    const {accessToken,refreshToken} = await generateAccessAndRefreshToken(user._id);
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+    const options = {
+        httpOnly : true,
+        secure : true
+    }
+    return res
+    .status(200)
+    .cookie("accesToken", accessToken, options)
+    .cookie("refreshToken", refreshToken,options)
+    .json(
+        new ApiResponse(
+            200,
+            {
+                user: loggedInUser, accessToken,
+                refreshToken
+            },
+            "User Logged in Successfully"
+        )
+    );
+
+} )
+
+
 
 export { registerUser };
