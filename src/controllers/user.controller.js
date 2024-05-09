@@ -20,7 +20,7 @@ const generateAccessAndRefreshToken = async (userId) => {
     {
         throw new ApiError(500, "Error creating the access and refresh token from server side");
     }
-}
+};
 
 
 const registerUser = asyncHandler( async (req,res) => {
@@ -89,7 +89,7 @@ const registerUser = asyncHandler( async (req,res) => {
         )
     )
 
-} )
+} );
 
 const loginUser = asyncHandler( async (req,res) => {
 
@@ -130,7 +130,7 @@ const loginUser = asyncHandler( async (req,res) => {
     }
     return res
     .status(200)
-    .cookie("accesToken", accessToken, options)
+    .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken,options)
     .json(
         new ApiResponse(
@@ -143,8 +143,35 @@ const loginUser = asyncHandler( async (req,res) => {
         )
     );
 
+} );
+
+const logoutUser = asyncHandler( async (req,res) => {
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                refreshToken : undefined,
+            }
+        },
+        {
+            new : true
+        }
+    );
+    const options = {
+        httpOnly : true,
+        secure : true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken",options)
+    .clearCookie("refreshToken",options)
+    .json(
+        new ApiResponse(200,"User loggedOut Successfully")
+    )
+
+
 } )
 
 
-
-export { registerUser };
+export { registerUser, loginUser, logoutUser };
