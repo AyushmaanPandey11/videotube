@@ -29,7 +29,7 @@ router.route("/change-password").patch(verifyJwt,changeCurrentPassword);
 router.route("/current-user").get(verifyJwt,getCurrentUser);
 router.route("/update-account").patch(verifyJwt,updateUserDetails);
 router.route("/update-avatar").patch(verifyJwt,upload.single("avatar"),updateUserAvatar);
-router.route("/update-coverImage").patch(verifyJwt,upload.single("coverImage"),updateUserCoverImage);
+router.route("/update-coverImage").patch(verifyJwt,upload.single("CoverImage"),updateUserCoverImage);
 router.route("/channel/:username").get(verifyJwt,getUserChannelProfile);
 router.route("/history").get(verifyJwt,getWatchHistory);
 
